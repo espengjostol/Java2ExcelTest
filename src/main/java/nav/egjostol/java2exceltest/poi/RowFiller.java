@@ -1,5 +1,6 @@
 package nav.egjostol.java2exceltest.poi;
 
+import nav.egjostol.java2exceltest.sink.CellValueSetter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -7,7 +8,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 
 import java.util.Date;
 
-public class RowFiller {
+public class RowFiller implements CellValueSetter {
 
     private final CellStyle dateCellStyle;
     private final Row row;

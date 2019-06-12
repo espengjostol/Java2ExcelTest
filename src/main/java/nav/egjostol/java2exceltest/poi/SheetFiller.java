@@ -1,8 +1,10 @@
 package nav.egjostol.java2exceltest.poi;
 
+import nav.egjostol.java2exceltest.entitymeta.EntitySupport;
+import nav.egjostol.java2exceltest.sink.CellValueSetter;
+import nav.egjostol.java2exceltest.source.EntityGetter;
 import org.apache.poi.ss.usermodel.*;
 
-import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.IntStream;
 
@@ -14,14 +16,14 @@ public class SheetFiller<T> implements SheetPopulator {
 
     private final String sheetName;
     private final String[] columns;
-    private final List<T> entities;
-    private final BiConsumer<RowFiller, T> createRow;
+    private final EntityGetter<T> entityGetter;
+    private final BiConsumer<CellValueSetter, T> createRow;
 
-    public SheetFiller(String sheetName, String[] columns, List<T> entities, BiConsumer<RowFiller, T> createRow) {
-        this.sheetName = sheetName;
-        this.entities = entities;
-        this.columns = columns;
-        this.createRow = createRow;
+    SheetFiller(EntitySupport<T> support) {
+        this.sheetName = support.getEntityDescriptor().getEntityName();
+        this.entityGetter = support.getEntityGetter();
+        this.columns = support.getEntityDescriptor().getPropertyNames();
+        this.createRow = support.getCreateRow();
     }
 
     public void populateSheet(Workbook workbook) {
@@ -34,7 +36,7 @@ public class SheetFiller<T> implements SheetPopulator {
     private void createRows(Sheet sheet, CellStyle dateCellStyle) {
         int rowIndex = 1;
 
-        for (T entity : entities) {
+        for (T entity : entityGetter.getEntities()) {
             createRow.accept(new RowFiller(sheet, dateCellStyle, rowIndex++), entity);
         }
     }

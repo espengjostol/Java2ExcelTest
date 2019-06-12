@@ -2,8 +2,11 @@ package nav.egjostol.java2exceltest.poi;
 
 import nav.egjostol.java2exceltest.domain.Employee;
 import nav.egjostol.java2exceltest.domain.Period;
-import nav.egjostol.java2exceltest.map.EmployeeRowFiller;
-import nav.egjostol.java2exceltest.map.PeriodRowFiller;
+import nav.egjostol.java2exceltest.domaindesc.EmployeeDescriptor;
+import nav.egjostol.java2exceltest.domaindesc.PeriodDescriptor;
+import nav.egjostol.java2exceltest.domainmap.EmployeeRowFiller;
+import nav.egjostol.java2exceltest.domainmap.PeriodRowFiller;
+import nav.egjostol.java2exceltest.entitymeta.EntitySupport;
 import nav.egjostol.java2exceltest.poiexcel.ExcelWorkbookCreator;
 import org.junit.jupiter.api.Test;
 
@@ -17,15 +20,11 @@ class WorkbookWriterTest {
 
     @Test
     void createExcelFile() throws IOException {
-        String[] employeeColumns = {"Name", "Email", "Date Of Birth", "Salary"};
-        String[] periodColumns = {"Name", "Start", "End"};
-
         List<SheetPopulator> populators = List.of(
-                new SheetFiller<>("Employees", employeeColumns, prepareEmployees(), EmployeeRowFiller::setCellValues),
-                new SheetFiller<>("Periods", periodColumns, preparePeriods(), PeriodRowFiller::setCellValues));
+                new SheetFiller<>(new EntitySupport<>(WorkbookWriterTest::prepareEmployees, new EmployeeDescriptor(), EmployeeRowFiller::setCellValues)),
+                new SheetFiller<>(new EntitySupport<>(WorkbookWriterTest::preparePeriods, new PeriodDescriptor(), PeriodRowFiller::setCellValues)));
 
-        var writer = new WorkbookWriter(new ExcelWorkbookCreator(), populators, "poi-generated-file.xlsx");
-        writer.createFile();
+        WorkbookWriter.createFile(new ExcelWorkbookCreator(), populators, "poi-file-test.xlsx");
     }
 
     private static List<Employee> prepareEmployees() {
@@ -45,7 +44,10 @@ class WorkbookWriterTest {
                         newDate(2017, Calendar.AUGUST, 5)),
                 new Period("p2",
                         newDate(2018, Calendar.AUGUST, 21),
-                        newDate(2018, Calendar.SEPTEMBER, 29)));
+                        newDate(2018, Calendar.SEPTEMBER, 29)),
+                new Period("p3",
+                        newDate(2019, Calendar.AUGUST, 3),
+                        newDate(2019, Calendar.DECEMBER, 31)));
     }
 
     private static Date newDate(int year, int month, int dayOfMonth) {

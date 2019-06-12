@@ -12,24 +12,14 @@ import java.util.List;
  */
 class WorkbookWriter {
 
-    private final WorkbookCreator workbookCreator;
-    private final List<SheetPopulator> sheetPopulators;
-    private final String fileName;
-
-    WorkbookWriter(WorkbookCreator workbookCreator, List<SheetPopulator> sheetPopulators, String fileName) {
-        this.workbookCreator = workbookCreator;
-        this.sheetPopulators = sheetPopulators;
-        this.fileName = fileName;
-    }
-
-    void createFile() throws IOException {
+    static void createFile(WorkbookCreator workbookCreator, List<SheetPopulator> sheetPopulators, String fileName) throws IOException {
         try (Workbook workbook = workbookCreator.createWorkbook()) {
             sheetPopulators.forEach(o -> o.populateSheet(workbook));
-            writeToFile(workbook);
+            writeToFile(workbook, fileName);
         }
     }
 
-    private void writeToFile(Workbook workbook) throws IOException {
+    private static void writeToFile(Workbook workbook, String fileName) throws IOException {
         try (FileOutputStream output = new FileOutputStream(fileName)) {
             workbook.write(output);
         }
